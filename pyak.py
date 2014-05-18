@@ -117,7 +117,7 @@ class Yakker:
         self.location = Location("0", "0")
         self.handle = None
 
-        self.update_stats()
+        #self.update_stats()
         
     def get(self, page, params):
         url = self.base_url + page
@@ -242,12 +242,15 @@ class Yakker:
             "userID": self.id,
         }
         stats = self.get("getMyStats.php", params).text.split()
-        
-        self.num_messages = int(stats[0])
-        self.neg3 = int(stats[1])
-        self.upvotes_given = int(stats[2])
-        self.downvotes_given = int(stats[3])
-        self.yak_score = int(stats[4])
+        #TODO: fix this for real...
+        try:
+            self.num_messages = int(stats[0])
+            self.neg3 = int(stats[1])
+            self.upvotes_given = int(stats[2])
+            self.downvotes_given = int(stats[3])
+            self.yak_score = int(stats[4])
+        except IndexError:
+            pass
         
     def get_greatest(self):
         return self.get_yak_list("getGreatest.php", {})

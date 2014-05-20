@@ -1,5 +1,4 @@
 #pyak
---------
 
 Pyak is a simple python wrapper for Yik Yak's API.
 
@@ -41,3 +40,7 @@ yaks = yakker.get_yaks()
 for yak in yaks:
   print yak.message
 ```
+
+##Complete Documentation
+
+A more complete documentation is coming soon.

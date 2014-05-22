@@ -2,6 +2,10 @@
 
 Pyak is a simple python wrapper for Yik Yak's API.
 
+##Installation
+
+No installation is needed. Simply download pyak.py and place it in the same director as your program, then import pyak in your program.
+
 ##Basic Usage
 
 

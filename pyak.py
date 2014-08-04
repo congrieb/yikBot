@@ -1,7 +1,11 @@
+import base64
+import hmac
 import json
 import requests
 import time
 import urllib
+
+from hashlib import sha1
 
 def parse_time(timestr):
     format = "%Y-%m-%d %H:%M:%S"
@@ -106,7 +110,7 @@ class Yak:
         print "%s likes, %s comments. posted %s at %s %s" % (self.likes, self.comments, self.time, self.latitude, self.longitude)
 
 class Yakker:
-    base_url = "http://www.yikyakapp.com/YikYakFiles/"
+    base_url = "http://www.yikyakapp.com/api/"
     user_agent = "android-async-http/1.4.4 (http://loopj.com/android-async-http)"
     
     def __init__(self, user_id=None):
@@ -119,8 +123,41 @@ class Yakker:
 
         #self.update_stats()
         
+    def sign_request(self, page, params):
+        key = "35FD04E8-B7B1-45C4-9886-94A75F4A2BB4"
+    
+        #The salt is just the current time in seconds since epoch
+        salt = str(int(time.time()))
+        
+        #The message to be signed is essentially the request, with parameters sorted
+        msg = "/api/" + page
+        sorted_params = params.keys()
+        sorted_params.sort()
+        if len(params) > 0:
+            msg += "?"
+        for param in sorted_params:
+            msg += "%s=%s&" % (param, params[param])
+        #Chop off last "&"
+        if len(params) > 0:
+            msg = msg[:-1]
+        
+        #the salt is just appended directly
+        msg += salt
+        
+        #Calculate the signature
+        h = hmac.new(key, msg, sha1)
+        hash = base64.b64encode(h.digest())
+        
+        #Finally, actually add signature to request
+        params['hash'] = hash
+        params['salt'] = salt
+        
+
     def get(self, page, params):
         url = self.base_url + page
+        
+        self.sign_request(page, params)
+        
         if len(params) > 0:
             url += "?" + urllib.urlencode(params)
         
@@ -159,49 +196,49 @@ class Yakker:
             "userID": self.id,
             "message": message
         }
-        return self.get("contactUs.php", params)
+        return self.get("contactUs", params)
 
     def upvote_yak(self, message_id):
         params = {
             "userID": self.id,
             "messageID": message_id
         }
-        return self.get("likeMessage.php", params)
+        return self.get("likeMessage", params)
 
     def downvote_yak(self, message_id):
         params = {
             "userID": self.id,
             "messageID": message_id
         }
-        return self.get("downvoteMessage.php", params)
+        return self.get("downvoteMessage", params)
 
     def upvote_comment(self, comment_id):
         params = {
             "userID": self.id,
             "commentID": comment_id
         }
-        return self.get("likeComment.php", params)
+        return self.get("likeComment", params)
 
     def downvote_comment(self, comment_id):
         params = {
             "userID": self.id,
             "commentID": comment_id
         }
-        return self.get("downvoteComment.php", params)
+        return self.get("downvoteComment", params)
 
     def report_yak(self, message_id):
         params = params = {
             "userID": self.id,
             "messageID": message_id
         }
-        return self.get("reportMessage.php", params)
+        return self.get("reportMessage", params)
 
     def delete_yak(self, message_id):
         params = params = {
             "userID": self.id,
             "messageID": message_id
         }
-        return self.get("deleteMessage2.php", params)
+        return self.get("deleteMessage2", params)
 
     def report_comment(self, comment_id, message_id):
         params = {
@@ -209,7 +246,7 @@ class Yakker:
             "commentID": comment_id,
             "messageID": message_id,
         }
-        return self.get("reportMessage.php", params)
+        return self.get("reportMessage", params)
 
     def delete_comment(self, comment_id, message_id):
         params = {
@@ -217,7 +254,7 @@ class Yakker:
             "commentID": comment_id,
             "messageID": message_id,
         }
-        return self.get("deleteComment.php", params)
+        return self.get("deleteComment", params)
 
     def update_handle(self, handle):
         success = False 
@@ -227,7 +264,7 @@ class Yakker:
                 "userID": self.id,
                 "handle": self.handle
             }
-            success = bool(self.get("updateHandle.php", params) == "0")
+            success = bool(self.get("updateHandle", params) == "0")
 
         return success
 
@@ -235,13 +272,13 @@ class Yakker:
         params = {
             "userID": self.id,
         }
-        return self.get("getHandleInfo.php", params).text
+        return self.get("getHandleInfo", params).text
 
     def update_stats(self):
         params = {
             "userID": self.id,
         }
-        stats = self.get("getMyStats.php", params).text.split()
+        stats = self.get("getMyStats", params).text.split()
         #TODO: fix this for real...
         try:
             self.num_messages = int(stats[0])
@@ -253,35 +290,36 @@ class Yakker:
             pass
         
     def get_greatest(self):
-        return self.get_yak_list("getGreatest.php", {})
+        return self.get_yak_list("getGreatest", {})
         
     def get_my_tops(self):
         params = {
             "userID": self.id,
         }
-        return self.get_yak_list("getMyTops.php", params)
+        return self.get_yak_list("getMyTops", params)
         
     def get_recent_replied(self):
         params = {
             "userID": self.id,
         }
-        return self.get_yak_list("getMyRecentReplied.php", params)
+        return self.get_yak_list("getMyRecentReplied", params)
         
     def update_location(self, location):
-        self.loc = location
+        self.location = location
         params = {
             "userID": self.id,
             "lat": location.latitude,
             "long": location.longitude,
         }
-
-        return self.get("updateLocation.php", params)
+        
+        #Actually sending the location by itself no longer seems necessary
+        #return self.get("updateLocation", params)
         
     def get_my_recent_yaks(self):
         params = {
             "userID": self.id,
         }
-        return self.get_yak_list("getMyRecentYaks.php", params)
+        return self.get_yak_list("getMyRecentYaks", params)
         
     def get_area_tops(self, loc=None):
         if loc is None:
@@ -290,13 +328,15 @@ class Yakker:
             "lat": loc.latitude,
             "long": loc.longitude,
         }
-        return self.get_yak_list("getAreaTops.php", params)
+        return self.get_yak_list("getAreaTops", params)
     
     def get_yaks(self):
         params = {
             "userID": self.id,
+            "lat": self.location.latitude,
+            "long": self.location.longitude,
         }
-        return self.get_yak_list("getMessages.php", params)
+        return self.get_yak_list("getMessages", params)
     
     def post_yak(self, message, loc=None, showloc=False, handle=False):
         if loc is None:
@@ -311,7 +351,7 @@ class Yakker:
             params["hidePin"] = "1"
         if handle and (self.handle is not None):
             params["hndl"] = self.handle
-        return self.get("sendMessage.php", params)
+        return self.get("sendMessage", params)
 
     def get_comments(self, message_id):
         params = {
@@ -319,7 +359,7 @@ class Yakker:
             "messageID": message_id
         }
             
-        return self.parse_comments(self.get("getComments.php", params).text, message_id)
+        return self.parse_comments(self.get("getComments", params).text, message_id)
         
     def post_comment(self, message_id, comment):
         params = {
@@ -327,7 +367,7 @@ class Yakker:
             "messageID": message_id,
             "comment": comment,
         }
-        return self.get("postComment.php", params)
+        return self.get("postComment", params)
     
     def peek(self, location):
         params = {
@@ -336,8 +376,8 @@ class Yakker:
             "long": location.longitude,
             "delta": location.delta,
         }
-        return self.get_yak_list("getPeekMessages.php", params)
+        return self.get_yak_list("getPeekMessages", params)
     
     def register_id(self):
-        result = self.get("registerUserDroid.php", {})
+        result = self.get("registerUserDroid", {})
         return result.text

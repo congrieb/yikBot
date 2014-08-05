@@ -201,42 +201,54 @@ class Yakker:
     def upvote_yak(self, message_id):
         params = {
             "userID": self.id,
-            "messageID": message_id
+            "messageID": message_id,
+            "lat": self.location.latitude,
+            "long": self.location.longitude,
         }
         return self.get("likeMessage", params)
 
     def downvote_yak(self, message_id):
         params = {
             "userID": self.id,
-            "messageID": message_id
+            "messageID": message_id,
+            "lat": self.location.latitude,
+            "long": self.location.longitude,
         }
         return self.get("downvoteMessage", params)
 
     def upvote_comment(self, comment_id):
         params = {
             "userID": self.id,
-            "commentID": comment_id
+            "commentID": comment_id,
+            "lat": self.location.latitude,
+            "long": self.location.longitude,
         }
         return self.get("likeComment", params)
 
     def downvote_comment(self, comment_id):
         params = {
             "userID": self.id,
-            "commentID": comment_id
+            "commentID": comment_id,
+            "lat": self.location.latitude,
+            "long": self.location.longitude,
         }
         return self.get("downvoteComment", params)
 
     def report_yak(self, message_id):
         params = params = {
             "userID": self.id,
-            "messageID": message_id
+            "messageID": message_id,
+            "lat": self.location.latitude,
+            "long": self.location.longitude,
         }
         return self.get("reportMessage", params)
 
     def delete_yak(self, message_id):
         params = params = {
             "userID": self.id,
-            "messageID": message_id
+            "messageID": message_id,
+            "lat": self.location.latitude,
+            "long": self.location.longitude,
         }
         return self.get("deleteMessage2", params)
 
@@ -245,6 +257,8 @@ class Yakker:
             "userID": self.id,
             "commentID": comment_id,
             "messageID": message_id,
+            "lat": self.location.latitude,
+            "long": self.location.longitude,
         }
         return self.get("reportMessage", params)
 
@@ -253,6 +267,8 @@ class Yakker:
             "userID": self.id,
             "commentID": comment_id,
             "messageID": message_id,
+            "lat": self.location.latitude,
+            "long": self.location.longitude,
         }
         return self.get("deleteComment", params)
 
@@ -290,19 +306,28 @@ class Yakker:
             pass
         
     def get_greatest(self):
-        return self.get_yak_list("getGreatest", {})
+        params = {
+            "userID": self.id,
+            "lat": self.location.latitude,
+            "long": self.location.longitude,
+        }
+        return self.get_yak_list("getGreatest", params)
         
     def get_my_tops(self):
         params = {
             "userID": self.id,
+            "lat": self.location.latitude,
+            "long": self.location.longitude,
         }
         return self.get_yak_list("getMyTops", params)
         
     def get_recent_replied(self):
         params = {
             "userID": self.id,
+            "lat": self.location.latitude,
+            "long": self.location.longitude,
         }
-        return self.get_yak_list("getMyRecentReplied", params)
+        return self.get_yak_list("getMyRecentReplies", params)
         
     def update_location(self, location):
         self.location = location
@@ -318,15 +343,16 @@ class Yakker:
     def get_my_recent_yaks(self):
         params = {
             "userID": self.id,
+            "lat": self.location.latitude,
+            "long": self.location.longitude,
         }
         return self.get_yak_list("getMyRecentYaks", params)
         
-    def get_area_tops(self, loc=None):
-        if loc is None:
-            loc = self.location
+    def get_area_tops(self):
         params = {
-            "lat": loc.latitude,
-            "long": loc.longitude,
+            "userID": self.id,
+            "lat": self.location.latitude,
+            "long": self.location.longitude,
         }
         return self.get_yak_list("getAreaTops", params)
     
@@ -338,13 +364,11 @@ class Yakker:
         }
         return self.get_yak_list("getMessages", params)
     
-    def post_yak(self, message, loc=None, showloc=False, handle=False):
-        if loc is None:
-            loc = self.location
+    def post_yak(self, message, showloc=False, handle=False):
         params = {
             "userID": self.id,
-            "lat": loc.latitude,
-            "long": loc.longitude,
+            "lat": self.location.latitude,
+            "long": self.location.longitude,
             "message": message,
         }
         if not showloc:
@@ -356,7 +380,9 @@ class Yakker:
     def get_comments(self, message_id):
         params = {
             "userID": self.id,
-            "messageID": message_id
+            "messageID": message_id,
+            "lat": self.location.latitude,
+            "long": self.location.longitude,
         }
             
         return self.parse_comments(self.get("getComments", params).text, message_id)
@@ -366,6 +392,8 @@ class Yakker:
             "userID": self.id,
             "messageID": message_id,
             "comment": comment,
+            "lat": self.location.latitude,
+            "long": self.location.longitude,
         }
         return self.get("postComment", params)
     

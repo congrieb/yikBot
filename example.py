@@ -15,4 +15,7 @@ yaks = yakker.get_yaks()
 
 for yak in yaks:
 	yak.print_yak()
+	comments = yak.get_comments()
+	for comment in comments:
+		print "    %s" % comment.comment
 	print ""

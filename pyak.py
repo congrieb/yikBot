@@ -204,7 +204,6 @@ class Yakker:
         return yaks
 
     def parse_comments(self, text, message_id):
-        print text
         try:
             raw_comments = json.loads(text)["comments"]
         except:

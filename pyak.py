@@ -143,7 +143,6 @@ class Yakker:
             "long": self.location.longitude,
         }
         result = self.get("registerUser", params)
-        print result.text
         return result
         
     def sign_request(self, page, params):

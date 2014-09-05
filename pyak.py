@@ -4,8 +4,10 @@ import json
 import requests
 import time
 import urllib
+import os
 
 from hashlib import sha1
+from hashlib import md5
 
 def parse_time(timestr):
     format = "%Y-%m-%d %H:%M:%S"
@@ -19,6 +21,7 @@ class Location:
             delta = "0.030000"
         self.delta = delta
 
+        
 class Comment:
     def __init__(self, raw, message_id, client):
         self.client = client
@@ -110,18 +113,38 @@ class Yak:
         print "%s likes, %s comments. posted %s at %s %s" % (self.likes, self.comments, self.time, self.latitude, self.longitude)
 
 class Yakker:
-    base_url = "http://www.yikyakapp.com/api/"
+    base_url = "http://yikyakapp.com/api/"
     user_agent = "android-async-http/1.4.4 (http://loopj.com/android-async-http)"
     
-    def __init__(self, user_id=None):
+    def __init__(self, user_id=None, location=None, force_register=False):
+        if location is None:
+            location = Location('0', '0')
+        self.update_location(location)
+        
         if user_id is None:
-            user_id = self.register_id()
+            user_id = self.gen_id()
+            self.register_id_new(user_id)
+        elif force_register:
+            self.register_id_new(user_id)
         
         self.id = user_id
-        self.location = Location("0", "0")
+        
         self.handle = None
 
         #self.update_stats()
+        
+    def gen_id(self):
+        return md5(os.urandom(128)).hexdigest().upper()
+        
+    def register_id_new(self, id):
+        params = {
+            "userID": id,
+            "lat": self.location.latitude,
+            "long": self.location.longitude,
+        }
+        result = self.get("registerUser", params)
+        print result.text
+        return result
         
     def sign_request(self, page, params):
         key = "35FD04E8-B7B1-45C4-9886-94A75F4A2BB4"
@@ -182,6 +205,7 @@ class Yakker:
         return yaks
 
     def parse_comments(self, text, message_id):
+        print text
         try:
             raw_comments = json.loads(text)["comments"]
         except:
@@ -271,39 +295,6 @@ class Yakker:
             "long": self.location.longitude,
         }
         return self.get("deleteComment", params)
-
-    def update_handle(self, handle):
-        success = False 
-        if handle != self.handle:
-            self.handle = handle
-            params = {
-                "userID": self.id,
-                "handle": self.handle
-            }
-            success = bool(self.get("updateHandle", params) == "0")
-
-        return success
-
-    def get_handle_info(self):
-        params = {
-            "userID": self.id,
-        }
-        return self.get("getHandleInfo", params).text
-
-    def update_stats(self):
-        params = {
-            "userID": self.id,
-        }
-        stats = self.get("getMyStats", params).text.split()
-        #TODO: fix this for real...
-        try:
-            self.num_messages = int(stats[0])
-            self.neg3 = int(stats[1])
-            self.upvotes_given = int(stats[2])
-            self.downvotes_given = int(stats[3])
-            self.yak_score = int(stats[4])
-        except IndexError:
-            pass
         
     def get_greatest(self):
         params = {
@@ -331,14 +322,6 @@ class Yakker:
         
     def update_location(self, location):
         self.location = location
-        params = {
-            "userID": self.id,
-            "lat": location.latitude,
-            "long": location.longitude,
-        }
-        
-        #Actually sending the location by itself no longer seems necessary
-        #return self.get("updateLocation", params)
         
     def get_my_recent_yaks(self):
         params = {
@@ -406,6 +389,3 @@ class Yakker:
         }
         return self.get_yak_list("getPeekMessages", params)
     
-    def register_id(self):
-        result = self.get("registerUserDroid", {})
-        return result.text

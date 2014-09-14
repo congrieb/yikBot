@@ -21,6 +21,18 @@ class Location:
             delta = "0.030000"
         self.delta = delta
 
+    def __str__(self):
+        return "Location(%s, %s)" % (self.latitude, self.longitude)
+
+class PeekLocation:
+    def __init__(self, raw):
+        self.id = raw['peekID']
+        self.can_submit = bool(raw['canSubmit'])
+        self.name = raw['location']
+        lat = raw['latitude']
+        lon = raw['longitude']
+        d = raw['delta']
+        self.location = Location(lat, lon, d)
         
 class Comment:
     def __init__(self, raw, message_id, client):
@@ -387,13 +399,49 @@ class Yakker:
             "long": self.location.longitude,
         }
         return self.post("postComment", params)
-    
-    def peek(self, location):
+
+    def get_peek_locations(self):
         params = {
             "userID": self.id,
-            "lat": location.latitude,
-            "long": location.longitude,
-            "delta": location.delta,
+            "lat": self.location.latitude,
+            "long": self.location.longitude,
+        }
+        data = self.get("getMessages", params).json()
+        peeks = []
+        for peek_json in data['otherLocations']:
+            peeks.append(PeekLocation(peek_json))
+        return peeks
+
+    def get_featured_locations(self):
+        params = {
+            "userID": self.id,
+            "lat": self.location.latitude,
+            "long": self.location.longitude,
+        }
+        data = self.get("getMessages", params).json()
+        peeks = []
+        for peek_json in data['featuredLocations']:
+            peeks.append(PeekLocation(peek_json))
+        return peeks
+
+    def get_yakarma(self):
+        params = {
+            "userID": self.id,
+            "lat": self.location.latitude,
+            "long": self.location.longitude,
+        }
+        data = self.get("getMessages", params).json()
+        return int(data['yakarma'])
+    
+    def peek(self, peek_id):
+        if isinstance(peek_id, PeekLocation):
+            peek_id = peek_id.id
+
+        params = {
+            "userID": self.id,
+            "lat": self.location.latitude,
+            "long": self.location.longitude,
+            'peekID': peek_id,
         }
         return self.get_yak_list("getPeekMessages", params)
     

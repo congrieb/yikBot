@@ -170,25 +170,35 @@ class Yakker:
         h = hmac.new(key, msg, sha1)
         hash = base64.b64encode(h.digest())
         
-        #Finally, actually add signature to request
-        params['hash'] = hash
-        params['salt'] = salt
+        return hash, salt
         
 
     def get(self, page, params):
         url = self.base_url + page
         
-        self.sign_request(page, params)
-        
-        if len(params) > 0:
-            url += "?" + urllib.urlencode(params)
+        hash, salt = self.sign_request(page, params)
+        params['hash'] = hash
+        params['salt'] = salt
         
         headers = {
             "User-Agent": self.user_agent,
             "Accept-Encoding": "gzip",
         }
         
-        return requests.get(url, headers=headers)
+        return requests.get(url, params=params, headers=headers)
+
+    def post(self, page, params):
+        url = self.base_url + page
+        
+        hash, salt = self.sign_request(page, params)
+        getparams = {'hash': hash, 'salt': salt}
+
+        headers = {
+            "User-Agent": self.user_agent,
+            "Accept-Encoding": "gzip",
+        }
+        
+        return requests.post(url, data=params, params=getparams, headers=headers)
 
     def get_yak_list(self, page, params):
         return self.parse_yaks(self.get(page, params).text)
@@ -356,7 +366,7 @@ class Yakker:
             params["hidePin"] = "1"
         if handle and (self.handle is not None):
             params["hndl"] = self.handle
-        return self.get("sendMessage", params)
+        return self.post("sendMessage", params)
 
     def get_comments(self, message_id):
         params = {
@@ -376,7 +386,7 @@ class Yakker:
             "lat": self.location.latitude,
             "long": self.location.longitude,
         }
-        return self.get("postComment", params)
+        return self.post("postComment", params)
     
     def peek(self, location):
         params = {

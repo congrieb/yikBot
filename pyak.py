@@ -93,6 +93,9 @@ class Yak:
         self.liked = int(raw["liked"])
         self.reyaked = raw["reyaked"]
 
+        #For some reason this seems necessary
+        self.message_id = self.message_id.replace('\\', '')
+
     def upvote(self):
         if self.liked == 0:
             self.liked += 1

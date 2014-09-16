@@ -45,6 +45,8 @@ class Comment:
         self.poster_id = raw["posterID"]
         self.liked = int(raw["liked"])
 
+        self.message_id = self.message_id.replace('\\', '')
+
     def upvote(self):
         if self.liked == 0:
             self.likes += 1

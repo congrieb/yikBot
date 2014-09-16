@@ -82,7 +82,6 @@ class Yak:
         self.client = client
         self.poster_id = raw["posterID"]
         self.hide_pin = bool(int(raw["hidePin"]))
-        self.handle = raw["handle"]
         self.message_id = raw["messageID"]
         self.delivery_id = raw["deliveryID"]
         self.longitude = raw["longitude"]
@@ -94,6 +93,12 @@ class Yak:
         self.type = raw["type"]
         self.liked = int(raw["liked"])
         self.reyaked = raw["reyaked"]
+        
+        #Yaks don't always have a handle
+        try:
+            self.handle = raw["handle"]
+        except KeyError:
+            self.handle = None
 
         #For some reason this seems necessary
         self.message_id = self.message_id.replace('\\', '')

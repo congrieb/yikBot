@@ -45,6 +45,16 @@ for yak in yaks:
   print yak.message
 ```
 
+####Posting
+
+Posting is simple:
+
+```python
+#Note that you must wait a fair amount of time (around a minute) after registering
+#before you are allowed to post
+yakker.post_yak("Hello World!")
+```
+
 ##Complete Documentation
 
 A more complete documentation is coming soon.

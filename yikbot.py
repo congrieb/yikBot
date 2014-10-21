@@ -2,8 +2,9 @@ import pyak
 import time
 from multiprocessing import Process
 
-def threaded_scan(pattern1, pattern2):
+def threaded_scan(pattern1, pattern2, location):
 	yakker = pyak.Yakker()
+	yakker.update_location(location)
 	print "created a new yakker on a new thread ", yakker
 	time.sleep(90)
 	print "waking yakker ", yakker, " back up"
@@ -103,7 +104,7 @@ class YikBot(pyak.Yakker):
 
     def create_and_scan(self, count, pattern1, pattern2):
         for i in range(0, count):
-            p = Process(target = threaded_scan, args = (pattern1, pattern2))
+            p = Process(target = threaded_scan, args = (pattern1, pattern2, self.location))
             p.start()
 
     def clear_yakkers(self):

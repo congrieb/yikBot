@@ -10,6 +10,7 @@ yb.handle = "yikBot"
 yb.update_location(yLocation)
 print "DEBUG: Registered yikBot with handle %s and id %s" % (yb.handle, yb.id)
 
+print "DEBUG: Going to sleep, new yakkers must wait ~90 seconds before they can act"
 time.sleep(90)
 
 print "DEBUG: yikBot instance 90 seconds after initialization"

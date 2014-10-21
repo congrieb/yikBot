@@ -15,17 +15,18 @@ class YikBot(pyak.Yakker):
             print "DEBUG: Going to sleep, will repeat in 10 seconds"
             time.sleep(10)
 
-    def scan(self, pattern):
+    def scan(self, pattern1, pattern2):
         while True:
             print "DEBUG: Scanning All yaks for"
             print pattern
-            yaks = self.get_yaks()
-            for yak in yaks:
-                if yak.message.find(pattern) != -1:
-                    print "Found Yak containing target pattern"
-                    self.multi_upvote(yak.message, 20)
-            print "DEBUG: Sleeping for 10 seconds and scanning again"
-            time.sleep(10)
+            for user in self.yakkers:
+	        yaks = user.get_yaks()
+                for yak in yaks:	
+                    if yak.message.find(pattern1) != -1 or yak.message.find(pattern2) != -1:
+                        print "Found Yak containing target pattern"
+                        yak.upvote()
+                print "DEBUG: Sleeping for 2 seconds and scanning again"
+                time.sleep(2)
                     
 
     def respond(self, yak):
@@ -72,9 +73,6 @@ class YikBot(pyak.Yakker):
                 if yak.message == message:
                     yak.downvote()
                     print "DEBUG: Downvoted yak"
-<<<<<<< HEAD
-                    continue
-=======
                     break
 
     def create_yakkers(self, count):
@@ -86,4 +84,3 @@ class YikBot(pyak.Yakker):
 
     def clear_yakkers(self):
         self.yakkers = []
->>>>>>> 2f7fbcb853515d701eb35975665457396e9debfe

@@ -17,6 +17,7 @@ class YikBot(pyak.Yakker):
         yak.add_comment("Hi, I'm yikBot")
 
     def multi_upvote(self, message, count):
+        yakkers = []
         for i in range(0, count):
             yakker = pyak.Yakker()
             print "DEBUG: Registered new user with id %s" % yakker.id
@@ -35,6 +36,7 @@ class YikBot(pyak.Yakker):
                     continue
 
     def multi_downvote(self, message, count):
+        yakkers = []
         for i in range(0, count):
             yakker = pyak.Yakker()
             print "DEBUG: Registered new user with id %s" % yakker.id

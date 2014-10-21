@@ -10,7 +10,7 @@ class YikBot(pyak.Yakker):
                 if yak.message.startswith("@yikBot"):
                     print "DEBUG: Found a targeted yak"
                     self.respond(yak)
-            print "DEBUG: Going to sleep"
+            print "DEBUG: Going to sleep, will repeat in 10 seconds"
             time.sleep(10)
 
     def respond(self, yak):
@@ -23,7 +23,7 @@ class YikBot(pyak.Yakker):
             yakker.update_location(self.location)
             yakkers.append(yakker)
 
-        print "DEBUG: Going to sleep"
+        print "DEBUG: Going to sleep, new yakkers must wait ~90 seconds before they can act"
         time.sleep(90)
 
         for yakker in yakkers:
@@ -41,7 +41,7 @@ class YikBot(pyak.Yakker):
             yakker.update_location(self.location)
             yakkers.append(yakker)
 
-        print "DEBUG: Going to sleep"
+        print "DEBUG: Going to sleep, new yakkers must wait ~90 seconds before they can act"
         time.sleep(90)
 
         for yakker in yakkers:

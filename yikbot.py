@@ -4,12 +4,10 @@ from multiprocessing import Process
 
 def threaded_scan(pattern1, pattern2):
 	yakker = pyak.Yakker()
-	print "created a new yakker on a new thread"
-	print pattern1
-	print pattern2
-	time.sleep(10)
-	print "waking yakker back up"
-	#yakker.single_scan(pattern1, pattern2)
+	print "created a new yakker on a new thread ", yakker
+	time.sleep(90)
+	print "waking yakker ", yakker, " back up"
+	yakker.single_scan(pattern1, pattern2)
 
 class YikBot(pyak.Yakker):
     yakkers = []
@@ -40,11 +38,8 @@ class YikBot(pyak.Yakker):
 
     def single_scan(self, pattern1, pattern2):
         while True:
-            print "DEBUG: Yakker "
-            print self
-            print "DEBUG: Scanning All yaks for"
-            print pattern1
-            print pattern2
+            print "DEBUG: Yakker ", self
+            print "DEBUG: Scanning All yaks for ", pattern1, " or " , pattern2
 	    yaks = self.get_yaks()
             for yak in yaks:	
                 if yak.message.find(pattern1) != -1 or yak.message.find(pattern2) != -1:

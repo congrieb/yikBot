@@ -2,6 +2,8 @@ import pyak
 import time
 
 class YikBot(pyak.Yakker):
+    yakkers = []
+
     def boot(self):
         while True:
             print "DEBUG: Scanning feed"
@@ -26,14 +28,17 @@ class YikBot(pyak.Yakker):
 
         print "DEBUG: Going to sleep, new yakkers must wait ~90 seconds before they can act"
         time.sleep(90)
+        print "DEBUG: Waking up and beginning scan"
 
         for yakker in yakkers:
+            print "DEBUG: yakker %s now scanning"
             yaks = yakker.get_yaks()
             for yak in yaks:
                 if yak.message == message:
                     yak.upvote()
                     print "DEBUG: Upvoted yak"
-                    continue
+                    break
+
 
     def multi_downvote(self, message, count):
         yakkers = []
@@ -45,11 +50,23 @@ class YikBot(pyak.Yakker):
 
         print "DEBUG: Going to sleep, new yakkers must wait ~90 seconds before they can act"
         time.sleep(90)
+        print "DEBUG: Waking up and beginning scan"
 
         for yakker in yakkers:
+            print "DEBUG: yakker %s now scanning"
             yaks = yakker.get_yaks()
             for yak in yaks:
                 if yak.message == message:
                     yak.downvote()
                     print "DEBUG: Downvoted yak"
-                    continue
+                    break
+
+    def create_yakkers(self, count):
+        for i in range(0, count):
+            yakker = pyak.Yakker()
+            print "DEBUG: Registered new user with id %s" % yakker.id
+            yakker.update_location(self.location)
+            self.yakkers.append(yakker)
+
+    def clear_yakkers(self):
+        self.yakkers = []

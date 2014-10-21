@@ -13,6 +13,19 @@ class YikBot(pyak.Yakker):
             print "DEBUG: Going to sleep, will repeat in 10 seconds"
             time.sleep(10)
 
+    def scan(self, pattern):
+        while True:
+            print "DEBUG: Scanning All yaks for"
+            print pattern
+            yaks = self.get_yaks()
+            for yak in yaks:
+                if yak.message.find(pattern) != -1:
+                    print "Found Yak containing target pattern"
+                    self.multi_upvote(yak.message, 20)
+            print "DEBUG: Sleeping for 10 seconds and scanning again"
+            time.sleep(10)
+                    
+
     def respond(self, yak):
         yak.add_comment("Hi, I'm yikBot")
 

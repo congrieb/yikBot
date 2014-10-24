@@ -3,12 +3,12 @@ import time
 from multiprocessing import Process
 
 def threaded_scan(pattern1, pattern2, location):
-	yakker = pyak.Yakker()
-	yakker.update_location(location)
-	print "created a new yakker on a new thread ", yakker
+	#yakker = pyak.Yakker()
+	#yakker.update_location(location)
+	print "created a new yakker on a new thread ", "yakker"
 	time.sleep(90)
-	print "waking yakker ", yakker, " back up"
-	yakker.single_scan(pattern1, pattern2)
+	print "waking yakker ", "yakker", " back up"
+	#yakker.single_scan(pattern1, pattern2)
 
 class YikBot(pyak.Yakker):
     yakkers = []

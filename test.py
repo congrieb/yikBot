@@ -10,7 +10,7 @@ yb = yikbot.YikBot()
 
 yb.update_location(yLocation)
 
-yb.handle = "Andrew Jackson"
+yb.handle = "William Taft"
 
 print "Bot created and location set, now sleeping for 90 seconds"
 
